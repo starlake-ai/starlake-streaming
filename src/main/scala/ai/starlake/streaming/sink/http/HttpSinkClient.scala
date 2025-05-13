@@ -6,7 +6,6 @@ import org.apache.http.impl.conn.PoolingHttpClientConnectionManager
 import org.apache.http.util.EntityUtils
 import org.apache.spark.sql.DataFrame
 
-import java.util.concurrent.TimeUnit
 import scala.collection.mutable.ArrayBuffer
 import scala.util.Using
 
@@ -29,9 +28,10 @@ private[http] class HttpSinkClient(parameters: Map[String, String]) extends Stri
   private def client =
     HttpClients
       .custom()
+      // .evictExpiredConnections()
+      // .evictIdleConnections(maxIdleTimeInSeconds, TimeUnit.SECONDS)
+      // .setConnectionManagerShared(true)
       .setConnectionManager(connectionManager)
-      .evictExpiredConnections()
-      .evictIdleConnections(maxIdleTimeInSeconds, TimeUnit.SECONDS)
       .build();
 
   def send(dataFrame: DataFrame): Int = {
