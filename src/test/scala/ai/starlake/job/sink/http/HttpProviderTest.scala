@@ -25,7 +25,7 @@ class HttpProviderTest
   val outputStream = new ByteArrayOutputStream()
 
   class RootHandler extends HttpHandler {
-    def handle(t: HttpExchange) {
+    def handle(t: HttpExchange): Unit = {
       logPayload(t.getRequestBody)
       sendResponse(t)
     }
@@ -36,7 +36,7 @@ class HttpProviderTest
         .foreach(outputStream.write)
     }
 
-    private def sendResponse(t: HttpExchange) {
+    private def sendResponse(t: HttpExchange): Unit = {
       val response = "Ack!"
       t.sendResponseHeaders(200, response.length())
       val os = t.getResponseBody
@@ -47,7 +47,8 @@ class HttpProviderTest
   private val LOAD_PORT = 9100
 
   s"Load from HTTP Source to multiple URLs" should "work" in {
-    val spark = SparkSession.builder
+    val spark = SparkSession
+      .builder()
       .master("local[1]")
       .getOrCreate();
     File("/tmp/http2").delete(true)
@@ -65,7 +66,7 @@ class HttpProviderTest
       )
       .load()
     val thread = new Thread {
-      override def run {
+      override def run: Unit = {
         Thread.sleep(2000)
         val post1 = new HttpPost(s"http://localhost:$LOAD_PORT/test1")
         val post2 = new HttpPost(s"http://localhost:$LOAD_PORT/test2")
@@ -102,7 +103,8 @@ class HttpProviderTest
   }
 
   s"Save in HTTP Sink" should "work" in {
-    val spark = SparkSession.builder
+    val spark = SparkSession
+      .builder()
       .master("local[1]")
       .getOrCreate();
     File("/tmp/sink").delete(true)
@@ -120,7 +122,7 @@ class HttpProviderTest
       .writeStream
       .format("starlake-http")
       .option("url", s"http://localhost:$SAVE_PORT")
-      .start
+      .start()
     events.addData("0", "1", "2")
     // streamingQuery.processAllAvailable()
     streamingQuery.awaitTermination(2000)

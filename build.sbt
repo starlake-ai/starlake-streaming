@@ -1,11 +1,10 @@
-import Dependencies.{dependencies, jacksonForSpark3, spark3}
-import Versions.pureConfig
+import Dependencies.dependencies
 import sbt.Tests.{Group, SubProcess}
-import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations._
+import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations.*
 import sbtrelease.Version.Bump.Next
-import xerial.sbt.Sonatype._
+import xerial.sbt.Sonatype.*
 
-lazy val javacCompilerVersion = "11"
+lazy val javacCompilerVersion = "17"
 
 javacOptions ++= Seq(
   "-source", javacCompilerVersion,

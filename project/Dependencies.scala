@@ -49,24 +49,23 @@ object Dependencies {
 
   // Provided
 
-  val jacksonForSpark3 = Seq(
-    "com.fasterxml.jackson.core" % "jackson-core" % Versions.jacksonForSpark3 % "provided",
-    "com.fasterxml.jackson.core" % "jackson-annotations" % Versions.jacksonForSpark3 % "provided",
-    "com.fasterxml.jackson.core" % "jackson-databind" % Versions.jacksonForSpark3 % "provided",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala" % Versions.jacksonForSpark3 % "provided",
-    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % Versions.jacksonForSpark3 % "provided",
-    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % Versions.jacksonForSpark3 % "provided"
+  val jacksonForSpark4 = Seq(
+    "com.fasterxml.jackson.core" % "jackson-core" % Versions.jacksonForSpark4 % "provided",
+    "com.fasterxml.jackson.core" % "jackson-annotations" % Versions.jacksonForSpark4 % "provided",
+    "com.fasterxml.jackson.core" % "jackson-databind" % Versions.jacksonForSpark4 % "provided",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % Versions.jacksonForSpark4 % "provided",
+    "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % Versions.jacksonForSpark4 % "provided",
+    "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % Versions.jacksonForSpark4 % "provided"
   )
 
-  val spark3 = Seq(
-    "org.apache.spark" %% "spark-core" % Versions.spark3 % "provided" exclude ("com.google.guava", "guava") excludeAll (jacksonExclusions: _*),
-    "org.apache.spark" %% "spark-sql" % Versions.spark3 % "provided" exclude ("com.google.guava", "guava") excludeAll (jacksonExclusions: _*),
-    "org.apache.spark" %% "spark-hive" % Versions.spark3 % "provided" exclude ("com.google.guava", "guava") excludeAll (jacksonExclusions: _*),
-    "org.apache.spark" %% "spark-mllib" % Versions.spark3 % "provided" exclude ("com.google.guava", "guava") excludeAll (jacksonExclusions: _*),
-    "com.databricks" %% "spark-xml" % Versions.sparkXML excludeAll (jacksonExclusions: _*),
-    "org.apache.spark" %% "spark-sql-kafka-0-10" % Versions.spark3 excludeAll (jacksonExclusions: _*),
-    "org.apache.spark" %% "spark-avro" % Versions.spark3 excludeAll (jacksonExclusions: _*),
-    "io.delta" %% "delta-spark" % Versions.deltaSpark3d0 % "provided" exclude ("com.google.guava", "guava") excludeAll (jacksonExclusions: _*)
+  val spark4 = Seq(
+    "org.apache.spark" %% "spark-core" % Versions.spark4 % "provided" exclude ("com.google.guava", "guava") excludeAll (jacksonExclusions: _*),
+    "org.apache.spark" %% "spark-sql" % Versions.spark4 % "provided" exclude ("com.google.guava", "guava") excludeAll (jacksonExclusions: _*),
+    "org.apache.spark" %% "spark-hive" % Versions.spark4 % "provided" exclude ("com.google.guava", "guava") excludeAll (jacksonExclusions: _*),
+    "org.apache.spark" %% "spark-mllib" % Versions.spark4 % "provided" exclude ("com.google.guava", "guava") excludeAll (jacksonExclusions: _*),
+    "org.apache.spark" %% "spark-sql-kafka-0-10" % Versions.spark4 excludeAll (jacksonExclusions: _*),
+    "org.apache.spark" %% "spark-avro" % Versions.spark4 excludeAll (jacksonExclusions: _*),
+    "io.delta" %% "delta-spark" % Versions.deltaSpark4d0 % "provided" exclude ("com.google.guava", "guava") excludeAll (jacksonExclusions: _*)
   )
 
   val scalaTest = Seq(
@@ -79,7 +78,7 @@ object Dependencies {
     "com.typesafe.scala-logging" %% "scala-logging" % Versions.scalaLogging
   )
 
-  val starlake = Seq("ai.starlake" %% "starlake-core" % "1.3.2" % "provided")
+  val starlake = Seq("ai.starlake" %% "starlake-core" % "1.5.3-SNAPSHOT" % "provided")
 
-  val dependencies = logging ++ scalaTest ++ starlake ++ spark3 ++ jacksonForSpark3
+  val dependencies = logging ++ scalaTest ++ starlake ++ spark4 ++ jacksonForSpark4
 }

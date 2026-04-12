@@ -58,17 +58,13 @@ private[http] class HttpSinkClient(parameters: Map[String, String]) extends Stri
     logger.debug(s"request: ${rows.mkString("Array(", ", ", ")")}");
     transformer.requestUris(url, rows).foreach { requestUri =>
       Using(client.execute(requestUri)) { response =>
-        try {
-          val ok = (200 to 299) contains response.getStatusLine.getStatusCode
-          if (!ok)
-            throw new RuntimeException(response.getStatusLine.getReasonPhrase)
+        val ok = (200 to 299) contains response.getStatusLine.getStatusCode
+        if (!ok)
+          throw new RuntimeException(response.getStatusLine.getReasonPhrase)
 
-          val responseBody = EntityUtils.toString(response.getEntity, "UTF-8")
-          logger.debug("Response from HTTP Sink: " + responseBody)
-          response.getStatusLine.getStatusCode
-        } finally {
-          response.close()
-        }
+        val responseBody = EntityUtils.toString(response.getEntity, "UTF-8")
+        logger.debug("Response from HTTP Sink: " + responseBody)
+        response.getStatusLine.getStatusCode
       }
     }
   }
