@@ -2,7 +2,6 @@ import Dependencies.dependencies
 import sbt.Tests.{Group, SubProcess}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations.*
 import sbtrelease.Version.Bump.Next
-import xerial.sbt.Sonatype.*
 
 lazy val javacCompilerVersion = "17"
 
@@ -37,9 +36,7 @@ val testJavaOptions = {
 
 Test / javaOptions ++= testJavaOptions
 
-ThisBuild / sonatypeCredentialHost := "s01.oss.sonatype.org"
-
-lazy val scala213 = "2.13.16"
+lazy val scala213 = "2.13.18"
 
 lazy val supportedScalaVersions = List(scala213)
 
@@ -104,23 +101,22 @@ Compile / assembly / artifact := {
   art.withClassifier(Some("assembly"))
 }
 
+assembly / assemblyMergeStrategy := {
+  case "META-INF/services/org.apache.spark.sql.sources.DataSourceRegister" => MergeStrategy.concat
+  case PathList("META-INF", "services", _ @_*) => MergeStrategy.concat
+  case PathList("META-INF", _ @_*) => MergeStrategy.discard
+  case "reference.conf"            => MergeStrategy.concat
+  case _                           => MergeStrategy.first
+}
+
 // Assembly
 addArtifact(Compile / assembly / artifact, assembly)
 // Required by the Test container framework
 Test / fork := true
 
 // Publish
-publishTo := {
-  (
-    sys.env.get("GCS_BUCKET_ARTEFACTS"),
-    sys.env.getOrElse("RELEASE_SONATYPE", "true").toBoolean
-  ) match {
-    case (None, false) =>
-      sonatypePublishToBundle.value
-    case (None, true) => sonatypePublishToBundle.value
-    case (Some(value), _) =>
-      Some(GCSPublisher.forBucket(value, AccessRights.InheritBucket))
-  }
+publishTo := sys.env.get("GCS_BUCKET_ARTEFACTS").map { value =>
+  GCSPublisher.forBucket(value, AccessRights.InheritBucket)
 }
 // Disable scaladoc generation
 
@@ -137,19 +133,12 @@ publishLocal / checksums := Nil
 
 // publish / checksums := Nil
 
-// Your profile name of the sonatype account. The default is the same with the organization value
-sonatypeProfileName := "ai.starlake"
-
 // To sync with Maven central, you need to supply the following information:
 publishMavenStyle := true
 
 // Open-source license of your choice
 licenses := Seq(
   "Apache License, Version 2.0" -> url("http://www.apache.org/licenses/LICENSE-2.0.html")
-)
-
-sonatypeProjectHosting := Some(
-  GitHubHosting("starlake-ai", "starlake", "hayssam.saleh@starlake.ai")
 )
 
 // Release
@@ -166,7 +155,6 @@ releaseProcess := Seq(
   commitReleaseVersion, // forces to push dirty files
   tagRelease,
   releaseStepCommandAndRemaining("+publishSigned"),
-  releaseStepCommand("sonatypeBundleRelease"),
   setNextVersion,
   commitNextVersion,
   pushChanges

@@ -9,11 +9,11 @@ import org.apache.spark.sql.types.StructType
 class HttpSourceProxy {
 
   def internalCreateDataFrame(
-                               session: SparkSession,
-                               rdd: RDD[InternalRow],
-                               schema: StructType,
-                               isStreaming: Boolean = false
-                             ): DataFrame = {
+    session: SparkSession,
+    rdd: RDD[InternalRow],
+    schema: StructType,
+    isStreaming: Boolean = false
+  ): DataFrame = {
     session.internalCreateDataFrame(
       rdd,
       schema,

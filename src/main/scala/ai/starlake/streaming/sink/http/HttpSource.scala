@@ -5,7 +5,8 @@ import com.typesafe.scalalogging.StrictLogging
 import org.apache.spark.rdd.RDD
 import org.apache.spark.sql.catalyst.InternalRow
 import org.apache.spark.sql.classic.ai.starlake.http.HttpSourceProxy
-import org.apache.spark.sql.execution.streaming.{LongOffset, Offset, SerializedOffset, Source}
+import org.apache.spark.sql.execution.streaming.{Offset, Source}
+import org.apache.spark.sql.execution.streaming.runtime.{LongOffset, SerializedOffset}
 import org.apache.spark.sql.types.{StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, SQLContext}
 import org.apache.spark.unsafe.types.UTF8String

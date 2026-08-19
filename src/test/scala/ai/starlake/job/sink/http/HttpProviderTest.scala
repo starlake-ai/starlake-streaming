@@ -6,7 +6,7 @@ import com.typesafe.scalalogging.StrictLogging
 import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
-import org.apache.spark.sql.execution.streaming.MemoryStream
+import org.apache.spark.sql.execution.streaming.runtime.MemoryStream
 import org.apache.spark.sql.{DatasetLogging, SparkSession}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -116,7 +116,7 @@ class HttpProviderTest
     import spark.implicits._
 
     val server = startHttpServer()
-    val events = new MemoryStream[String](1, sqlContext)
+    val events = new MemoryStream[String](1, spark)
     val streamingQuery = events
       .toDF()
       .writeStream
