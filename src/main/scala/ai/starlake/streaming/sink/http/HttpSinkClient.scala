@@ -57,7 +57,7 @@ private[http] class HttpSinkClient(parameters: Map[String, String]) extends Stri
   private def post(rows: Array[Seq[String]]): Unit = {
     logger.debug(s"request: ${rows.mkString("Array(", ", ", ")")}");
     transformer.requestUris(url, rows).foreach { requestUri =>
-      Using(client.execute(requestUri)) { response =>
+      Using.resource(client.execute(requestUri)) { response =>
         val ok = (200 to 299) contains response.getStatusLine.getStatusCode
         if (!ok)
           throw new RuntimeException(response.getStatusLine.getReasonPhrase)

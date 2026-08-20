@@ -7,6 +7,7 @@ import org.apache.http.client.methods.HttpPost
 import org.apache.http.entity.StringEntity
 import org.apache.http.impl.client.HttpClientBuilder
 import org.apache.spark.sql.execution.streaming.runtime.MemoryStream
+import org.apache.spark.sql.streaming.StreamingQueryException
 import org.apache.spark.sql.{DatasetLogging, SparkSession}
 import org.scalatest.BeforeAndAfterAll
 import org.scalatest.flatspec.AnyFlatSpec
@@ -129,5 +130,60 @@ class HttpProviderTest
     server.stop(0)
 
     outputStream.toString should be("""["0"]["1"]["2"]""")
+  }
+
+  private val FAIL_PORT = 9300
+  def startFailingHttpServer(): HttpServer = {
+    val server = HttpServer.create(new InetSocketAddress(FAIL_PORT), 0)
+    server.createContext(
+      "/",
+      new HttpHandler {
+        def handle(t: HttpExchange): Unit = {
+          val response = "error"
+          t.sendResponseHeaders(500, response.length())
+          val os = t.getResponseBody
+          os.write(response.getBytes)
+          os.close()
+        }
+      }
+    )
+    server.setExecutor(null)
+    server.start()
+    server
+  }
+
+  s"Save in HTTP Sink" should "fail the streaming query on a non-2xx response" in {
+    val spark = SparkSession
+      .builder()
+      .master("local[1]")
+      .getOrCreate();
+    File("/tmp/sink-fail").delete(true)
+    File("/tmp/sink-fail").createDirectory()
+    spark.conf.set("spark.sql.streaming.checkpointLocation", "/tmp/sink-fail");
+
+    import spark.implicits._
+
+    val server = startFailingHttpServer()
+    try {
+      val events = new MemoryStream[String](2, spark)
+      val streamingQuery = events
+        .toDF()
+        .writeStream
+        .format("starlake-http")
+        .option("url", s"http://localhost:$FAIL_PORT")
+        .option("numRetries", "1")
+        .start()
+      events.addData("0")
+
+      def rootCause(t: Throwable): Throwable =
+        if (t.getCause == null) t else rootCause(t.getCause)
+
+      val ex = intercept[StreamingQueryException] {
+        streamingQuery.awaitTermination(10000)
+      }
+      rootCause(ex).getMessage should include("Internal Server Error")
+    } finally {
+      server.stop(0)
+    }
   }
 }
