@@ -146,6 +146,10 @@ releaseCrossBuild := true
 
 releaseIgnoreUntrackedFiles := true
 
+// Artifacts are no longer published via sbt-release: this repo has no Sonatype/GCS
+// publishing target anymore. `sbt release` only bumps/tags/pushes the version; the
+// actual release assets (jar/pom/ivy.xml) are built and attached to the GitHub Release
+// by scripts/gh-release.sh, run separately after tagging. See plan Task 18.
 releaseProcess := Seq(
 //  checkSnapshotDependencies, //allow snapshot dependencies
   inquireVersions,
@@ -154,7 +158,6 @@ releaseProcess := Seq(
   setReleaseVersion,
   commitReleaseVersion, // forces to push dirty files
   tagRelease,
-  releaseStepCommandAndRemaining("+publishSigned"),
   setNextVersion,
   commitNextVersion,
   pushChanges
