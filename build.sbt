@@ -3,11 +3,10 @@ import sbt.Tests.{Group, SubProcess}
 import sbtrelease.ReleasePlugin.autoImport.ReleaseTransformations.*
 import sbtrelease.Version.Bump.Next
 
-lazy val javacCompilerVersion = "17"
+lazy val javacCompilerVersion = "25"
 
 javacOptions ++= Seq(
-  "-source", javacCompilerVersion,
-  "-target", javacCompilerVersion,
+  "--release", javacCompilerVersion,
   "-Xlint"
 )
 
@@ -81,7 +80,9 @@ scalacOptions ++= {
     "-deprecation",
     "-feature",
     "-Xmacro-settings:materialize-derivations",
-    "-Ywarn-unused:imports"
+    "-Ywarn-unused:imports",
+    "-release",
+    javacCompilerVersion
   ) ++ extractOptions
 
 }
